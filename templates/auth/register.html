@@ -3,8 +3,8 @@
 {% block body %}
     {% if error %}
         <div class="w3-panel w3-card-4 w3-red w3-display-container 
-            w3-padding w3-animate-top">
-            <span class="w3-button w3-red w3-display-topright"
+            w3-padding w3-animate-top center w3-round-large" style="width: 50%">
+            <span class="w3-button w3-red w3-display-topright w3-round-large"
                 onclick="this.parentElement.style.display='none'">
                 &times;
             </span>
@@ -27,13 +27,16 @@
                 required="required" class="w3-input w3-animate-zoom" >
             <label for="">Email</label>
             <br />
-            <div class="g-recaptcha" data-sitekey="{{ sk }}"></div>
+            <center>
+                <div class="g-recaptcha" data-sitekey="6LeyB2cUAAAAAECIVkO0wDrVKtqwlQ_caLMmAWrh"></div>
+            </center>
             <br />
             <input type="submit" value="{{ _('Signup') }}" 
                 class="w3-button w3-cell-row w3-green" />
             <p class="w3-tiny w3-center">If you already have an account, go to 
                 <a href="{{ handler.reverse_url('login') }}" 
                 class="w3-text-blue w3-hover-text-green w3-small">login </a>page</p>
+            <!-- <input type="hidden" name="ip" value="{{ request.remote_ip }}"> -->
         </form>
     </div>
 

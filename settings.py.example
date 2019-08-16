@@ -2,10 +2,6 @@ import os
 import uuid
 import base64
 import logging
-
-from mysql.connector import connect, Error
-
-
 import tornado
 import tornado.template
 
@@ -21,8 +17,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 define("port", default=8888, help="run on the given port", type=int)
 define("config", default=None, help="tornado config file")
 define("debug", default=False, help="debug mode")
-define("template", default="tornado",
-        help="select template engine",
+define("template", default="tornado", 
+        help="select template engine", 
         type=str
       )
 
@@ -55,25 +51,10 @@ else:
 settings = dict()
 settings['debug'] = DEPLOYMENT != DeploymentType.PRODUCTION or options.debug
 settings['static_path'] = MEDIA_ROOT
-settings['cookie_secret'] = base64.b64encode(
-    uuid.uuid4().bytes+uuid.uuid4().bytes
-)
+settings['cookie_secret'] = base64.b64encode(uuid.uuid4().bytes+uuid.uuid4().bytes)
 settings['xsrf_cookies'] = True
 settings['email_sender'] = 'example@gmail.com'
 settings['email_password'] = 'password'
-
-# db connection
-db = connect(
-    host='localhost',
-    database='dot',
-    username='reganto',
-    password=''
-)
-settings['db'] = db
-
-# secret keys
-settings['captcha_secret_key'] = 'captcha_key'
-settings['neverbounce_key'] = 'neverbounce_key'
 
 # Select template engine
 if options.template == 'tornado':
