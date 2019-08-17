@@ -57,3 +57,6 @@ target/
 # Settings
 settings.py
 
+# Test query
+'matrix Session.sql'
+
