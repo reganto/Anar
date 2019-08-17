@@ -18,7 +18,7 @@ class RegisterHandler(BaseHandler):
             page_title='Register',
             error=None)
 
-    def post(self):
+    async def post(self):
         username = self.get_argument('username', '')
         password = self.get_argument('password', '')
         email = self.get_argument('email', '')
