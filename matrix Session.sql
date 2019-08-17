@@ -1,1 +1,2 @@
-select * from users;
+-- delete from users where id = 9;
+-- select * from users;
