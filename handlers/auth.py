@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from argon2 import PasswordHasher
 from tornado.escape import xhtml_escape
+from mysql.connector import Error
 from handlers.base import BaseHandler
 from vendor.utils.captcha import check
 from vendor.utils.email import validation
@@ -44,13 +45,26 @@ class RegisterHandler(BaseHandler):
                 error=error
             )
 
-        # check for username in database
-        query = "SELECT * FROM users WHERE username=%s"
+        # check username
+        query = "SELECT username FROM users WHERE username=%s"
         username = xhtml_escape(username)
         self.cursor.execute(query, (username, ))
-
-        if self.cursor.fetchone() is not None:
+        result = self.cursor.fetchone()
+        if result is not None:
             error = "Username already exist"
+            self.render(
+                'auth/register.html',
+                page_title="Register",
+                error=error
+            )
+        
+        # check email
+        query = "SELECT email FROM users WHERE email=%s"
+        email = xhtml_escape(email)
+        self.cursor.execute(query, (email, ))
+        result = self.cursor.fetchone()
+        if result is not None:
+            error = "Email already exist"
             self.render(
                 'auth/register.html',
                 page_title="Register",
@@ -65,8 +79,7 @@ class RegisterHandler(BaseHandler):
         salt = uuid.uuid4().hex.encode('utf-8')
         # 3-hashed password+salt
         hashed_password = ph.hash(password+salt)
-        # 4-escape username and email
-        email = xhtml_escape(email)
+        
         # username = xhtml_escape(username) -> username already escaped
         # set status: -1 -> disable, 0 -> ban, 1 -> enable
         status = -1
@@ -89,8 +102,11 @@ class RegisterHandler(BaseHandler):
         VALUES (%s,%s,%s,%s,%s,%s,%s)
         """
 
-        self.cursor.execute(query, args)
-        self.settings.get('db').commit()
+        try:
+            self.cursor.execute(query, args)
+            self.settings.get('db').commit()
+        except Error as e:
+            print(e)
 
         # send email
         if send.send_email(email, token):
@@ -119,8 +135,11 @@ class VerifyTokenHandler(BaseHandler):
         query = "UPDATE users SET status = %s WHERE id = %s"
         args = (1, result[0])
 
-        self.cursor.execute(query, args)
-        self.settings.get('db').commit()
+        try:
+            self.cursor.execute(query, args)
+            self.settings.get('db').commit()
+        except Error as e:
+            print(e)
         self.write({'status': 'ok'})
 
 
