@@ -4,7 +4,7 @@ function passwordMatch()
     confirm = document.getElementById('confirm').value;
 
     if(password != confirm) {
-        document.getElementById('msg').innerHTML = 'not matching';
+        document.getElementById('msg').innerHTML = 'Not matching';
         document.getElementById('msg').style.color = 'red'; 
 
     } else {
