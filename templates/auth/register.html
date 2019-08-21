@@ -1,5 +1,10 @@
 {% extends ../base.html %}
 
+{% block head %}
+    <script src="{{ static_url('js/dyna.js') }}"></script>
+{% end %}
+
+
 {% block body %}
     {% if error %}
         <div class="w3-panel w3-card-4 w3-red w3-display-container 
@@ -17,15 +22,25 @@
         <form action="{{ handler.reverse_url('register') }}" 
             method="POST" class="w3-margin">
             {% module xsrf_form_html() %}
+            <label for="">Username</label>
             <input type="text" name="username" id="username" 
                 required="required" class="w3-input w3-animate-zoom" />
-            <label for="">Username</label>
+
+            <label for="">Password</label>
             <input type="password" name="password" id="password" 
                 required="required" class="w3-input w3-animate-zoom" />
-            <label for="">Password</label>
+            
+            <label>Confirm</label>
+            <input type="password" name="password" id="confirm" 
+                required="required" class="w3-input w3-animate-zoom"
+                onkeyup="passwordMatch()" />
+            
+            <p id="msg"></p>
+            
+            <label for="">Email</label>
             <input type="email" name="email" id="email" 
                 required="required" class="w3-input w3-animate-zoom" >
-            <label for="">Email</label>
+            
             <br />
             <center>
                 <div class="g-recaptcha" data-sitekey="6LeyB2cUAAAAAECIVkO0wDrVKtqwlQ_caLMmAWrh"></div>
