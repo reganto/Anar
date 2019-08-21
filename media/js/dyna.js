@@ -8,8 +8,8 @@ function passwordMatch()
         document.getElementById('msg').style.color = 'red'; 
 
     } else {
-        document.getElementById('msg').innerHTML = 'matching';
-        document.getElementById('msg').style.color = 'green';
+        document.getElementById('msg').innerHTML = '';
+        // document.getElementById('msg').style.color = 'green';
     }
 }
 
