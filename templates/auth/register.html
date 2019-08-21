@@ -19,12 +19,15 @@
 
     <div class="w3-panel w3-card-4 w3-round-xxlarge w3-light-grey center">
         <h1 class="w3-margin">Sign up</h1>
-        <form action="{{ handler.reverse_url('register') }}" 
+        <form id='reg' name='reg' action="{{ handler.reverse_url('register') }}" 
             method="POST" class="w3-margin">
             {% module xsrf_form_html() %}
             <label for="">Username</label>
             <input type="text" name="username" id="username" 
-                required="required" class="w3-input w3-animate-zoom" />
+                required="required" class="w3-input w3-animate-zoom"
+                onblur='JavaScript:xmlhttpPost("/ajax")' />
+
+            <p id="result"></p>
 
             <label for="">Password</label>
             <input type="password" name="password" id="password" 
@@ -33,7 +36,7 @@
             <label>Confirm</label>
             <input type="password" name="password" id="confirm" 
                 required="required" class="w3-input w3-animate-zoom"
-                onkeyup="passwordMatch()" />
+                onblur="passwordMatch()" />
             
             <p id="msg"></p>
             
