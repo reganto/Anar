@@ -145,3 +145,13 @@ class VerifyTokenHandler(BaseHandler):
 
 class LoginHandler(BaseHandler):
     pass
+
+
+class AjaxHandler(BaseHandler):
+    def post(self):
+        username = self.get_body_argument('username')
+        self.cursor = self.settings.get('db').cursor()
+        query = "SELECT * FROM users WHERE username=%s"
+        self.cursor.execute(query, (username, ))
+        if self.cursor.fetchone() is not None:
+            self.write('This username is not available')
