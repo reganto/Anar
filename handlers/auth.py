@@ -167,11 +167,25 @@ class LoginHandler(BaseHandler):
         )
     
     def post(self):
+        # mysql connection
+        self.cursor = self.settings.get('db').cursor()
+
+        # redis connection
+        r = self.settings.get('r')
+
         username = self.get_body_argument('username')
         password = self.get_body_argument('password')
         # g_recaptcha_response = self.get_argument('g-recaptcha-response', '')
 
-        self.cursor = self.settings.get('db').cursor()
+        # suspend user if enter incorrect password for 3 time
+        number_of_incorrect_passwords = r.get(username)
+        if number_of_incorrect_passwords is not None and int(number_of_incorrect_passwords) > 3:
+            query = "UPDATE users SET status=%s WHERE username=%s"
+            args = (0, xhtml_escape(username))
+            self.cursor.execute(query, args)
+            self.settings.get('db').commit()
+            
+
         query = "SELECT password, salt, status, token FROM users WHERE username=%s"
         args = (xhtml_escape(username), )
         self.cursor.execute(query, args)
@@ -179,7 +193,7 @@ class LoginHandler(BaseHandler):
 
         # check user status
         if result[2] == -1:
-            error = '''You MUST verify your account to continue.
+            error = '''You MUST verify your account.
             please check your email inbox!'''
             self.render(
                 'auth/login.html',
@@ -187,19 +201,23 @@ class LoginHandler(BaseHandler):
                 error=error,
             )
             return
-        # elif result[2] == 0:
-        #     error = 'Your account banned! please try 24 hours later'
-        #     self.render(
-        #         'auth/login.html',
-        #         page_title='login',
-        #         error=error,
-        #     )
+        elif result[2] == 0:
+            error = 'Your account has been suspended! please try 24 hours later'
+            self.render(
+                'auth/login.html',
+                page_title='login',
+                error=error,
+            )
+            return
+
         try:
             # hashed_password = result[0].encode('utf-8')
             password = password.encode('utf-8')
             salt = result[1].encode('utf-8')
             ph.verify(result[0], password+salt)
         except VerifyMismatchError:
+            r.incr(username, 1)
+            r.expire(username, 60 * 60 * 3)
             error = '''Your password is incorrect'''
             self.render(
                 'auth/login.html',
@@ -207,7 +225,7 @@ class LoginHandler(BaseHandler):
                 error=error,
             )
         else:
-            self.set_secure_cookie('user', xhtml_escape(result[3]))
+            # self.set_secure_cookie('user', xhtml_escape(result[3]))
             self.write({'login': 'True'})
         
 
@@ -218,4 +236,4 @@ class UserExistJaxHandler(BaseHandler):
         query = "SELECT * FROM users WHERE username=%s"
         self.cursor.execute(query, (username, ))
         if self.cursor.fetchone() is None:
-            self.write('This username does NOT exist')
+            self.write('Username does not exist')

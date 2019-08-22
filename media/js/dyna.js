@@ -58,16 +58,20 @@ function sendRequest(data)
     {
         if(self.xHRObject.readyState == 4 && self.xHRObject.status == 200)
         {
-            response = self.xHRObject.responseText;
-            document.getElementById('result').innerHTML = response;
-            document.getElementById('result').style.color = 'red';
-            if(response == 'This username does NOT exist')
-            {
-                document.getElementById('loginbtn').setAttribute('disabled', 'disabled');                
-            } else {
-                document.getElementById('loginbtn').removeAttribute('disabled');                
-            }
+            ninimini(self.xHRObject.responseText)
         }
     }
     self.xHRObject.send(null);
+}
+
+function ninimini(response)
+{
+    document.getElementById('result').innerHTML = response;
+    document.getElementById('result').style.color = 'red';
+    if(response == 'Username does not exist')
+    {
+        document.getElementById('loginbtn').setAttribute('disabled', 'disabled');                
+    } else {
+        document.getElementById('loginbtn').removeAttribute('disabled');                
+    }
 }
