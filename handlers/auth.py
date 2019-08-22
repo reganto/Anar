@@ -1,8 +1,11 @@
 import uuid
 from datetime import datetime
+
 from argon2 import PasswordHasher
 from tornado.escape import xhtml_escape
 from mysql.connector import Error
+
+
 from handlers.base import BaseHandler
 from vendor.utils.captcha import check
 from vendor.utils.email import validation
