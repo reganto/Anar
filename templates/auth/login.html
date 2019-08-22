@@ -1,0 +1,54 @@
+{% extends ../base.html %}
+
+{% block head %}
+    <script src="{{ static_url('js/dyna.js') }}"></script>
+{% end %}
+
+
+{% block body %}
+    {% if error %}
+        <div class="w3-panel w3-card-4 w3-red w3-display-container 
+            w3-padding w3-animate-top center w3-round-large" style="width: 50%">
+            <span class="w3-button w3-red w3-display-topright w3-round-large"
+                onclick="this.parentElement.style.display='none'">
+                &times;
+            </span>
+            {{ error }}
+        </div>
+    {% end %}
+
+    <div class="w3-panel w3-card-4 w3-round-xxlarge 
+        w3-light-grey center w3-animate-top w3-mobile">
+        <h1 class="w3-margin">Login</h1>
+        <form id='login' name='login' action="{{ handler.reverse_url('login') }}" 
+            method="POST" class="w3-margin">
+            {% module xsrf_form_html() %}
+            <label for="">Username</label>
+            <input type="text" name="username" id="username" 
+                required="required" class="w3-input w3-animate-zoom"
+                onblur='JavaScript:sendRequest(this.value)'/>
+
+            <p id="result"></p>
+
+            <label for="">Password</label>
+            <input type="password" name="password" id="password" 
+                required="required" class="w3-input w3-animate-zoom"/>
+            
+            <br />
+        
+            <!-- <center>
+                <div class="g-recaptcha" data-sitekey="6LeyB2cUAAAAAECIVkO0wDrVKtqwlQ_caLMmAWrh"></div>
+            </center> -->
+            
+            <br />
+            <input type="submit" value="{{ _('Login') }}" 
+                class="w3-button w3-cell-row w3-green" id="loginbtn" />
+            <p class="w3-tiny w3-center">If you haven't an account, go to 
+                <a href="{{ handler.reverse_url('register') }}" 
+                class="w3-text-blue w3-hover-text-green w3-small">Signup </a>page</p>
+            <!-- <input type="hidden" name="ip" value="{{ request.remote_ip }}"> -->
+        </form>
+    </div>
+
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+{% end %}
