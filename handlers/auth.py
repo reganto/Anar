@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from tornado.escape import xhtml_escape
 from mysql.connector import Error
 
@@ -146,10 +147,6 @@ class VerifyTokenHandler(BaseHandler):
         self.write({'status': 'ok'})
 
 
-class LoginHandler(BaseHandler):
-    pass
-
-
 class AjaxHandler(BaseHandler):
     def post(self):
         username = self.get_body_argument('username')
@@ -158,3 +155,67 @@ class AjaxHandler(BaseHandler):
         self.cursor.execute(query, (username, ))
         if self.cursor.fetchone() is not None:
             self.write('This username is not available')
+
+
+
+class LoginHandler(BaseHandler):
+    def get(self):
+        self.render(
+            'auth/login.html',
+            page_title='Login',
+            error=None
+        )
+    
+    def post(self):
+        username = self.get_body_argument('username')
+        password = self.get_body_argument('password')
+        # g_recaptcha_response = self.get_argument('g-recaptcha-response', '')
+
+        self.cursor = self.settings.get('db').cursor()
+        query = "SELECT password, salt, status, token FROM users WHERE username=%s"
+        args = (xhtml_escape(username), )
+        self.cursor.execute(query, args)
+        result = self.cursor.fetchone()
+
+        # check user status
+        if result[2] == -1:
+            error = '''You MUST verify your account to continue.
+            please check your email inbox!'''
+            self.render(
+                'auth/login.html',
+                page_title='login',
+                error=error,
+            )
+            return
+        # elif result[2] == 0:
+        #     error = 'Your account banned! please try 24 hours later'
+        #     self.render(
+        #         'auth/login.html',
+        #         page_title='login',
+        #         error=error,
+        #     )
+        try:
+            # hashed_password = result[0].encode('utf-8')
+            password = password.encode('utf-8')
+            salt = result[1].encode('utf-8')
+            ph.verify(result[0], password+salt)
+        except VerifyMismatchError:
+            error = '''Your password is incorrect'''
+            self.render(
+                'auth/login.html',
+                page_title='login',
+                error=error,
+            )
+        else:
+            self.set_secure_cookie('user', xhtml_escape(result[3]))
+            self.write({'login': 'True'})
+        
+
+class UserExistJaxHandler(BaseHandler):
+    def get(self):
+        username = self.get_query_argument('username')
+        self.cursor = self.settings.get('db').cursor()
+        query = "SELECT * FROM users WHERE username=%s"
+        self.cursor.execute(query, (username, ))
+        if self.cursor.fetchone() is None:
+            self.write('This username does NOT exist')
