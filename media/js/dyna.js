@@ -23,6 +23,9 @@ function xmlhttpPost(strURL)
     self.xmlHttpReq = new XMLHttpRequest();
     self.xmlHttpReq.open('POST', strURL, true);
     self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    csrf_token_input = document.getElementById('csrf').firstChild;
+    csrf_token = csrf_token_input.getAttribute('value');
+    self.xmlHttpReq.setRequestHeader('X-CSRFTOKEN', csrf_token);
     self.xmlHttpReq.onreadystatechange = function() {
         if(self.xmlHttpReq.readyState == 4) {
             updatepage(self.xmlHttpReq.responseText);

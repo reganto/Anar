@@ -22,7 +22,7 @@
         <h1 class="w3-margin">Sign up</h1>
         <form id='reg' name='reg' action="{{ handler.reverse_url('register') }}" 
             method="POST" class="w3-margin">
-            {% module xsrf_form_html() %}
+            <span id="csrf">{% module xsrf_form_html() %}</span>
             <label for="">Username</label>
             <input type="text" name="username" id="username" 
                 required="required" class="w3-input w3-animate-zoom"

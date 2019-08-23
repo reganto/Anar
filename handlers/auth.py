@@ -26,7 +26,6 @@ class RegisterHandler(BaseHandler):
         username = self.get_argument('username', '')
         password = self.get_argument('password', '')
         email = self.get_argument('email', '')
-
         self.cursor = self.settings.get('db').cursor()
 
         # check captcha
